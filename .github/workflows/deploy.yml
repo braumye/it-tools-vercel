@@ -1,0 +1,36 @@
+name: Deploy to Vercel
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每天 UTC 2:00 (北京时间 10:00) 执行
+  workflow_dispatch:      # 支持手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        
+      - name: Clone IT Tools
+        run: |
+          git clone https://github.com/CorentinTh/it-tools.git
+          cd it-tools
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+        
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          cd it-tools
+          vercel deploy --prod --token=$VERCEL_TOKEN
